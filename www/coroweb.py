@@ -142,7 +142,7 @@ class RequestHandler(object):
             return dict(error=e.error, data=e.data, message=e.message)
 
 def add_static(app):
-    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'upali')
+    path = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'frontend')
     path2 = os.path.join(os.path.dirname(os.path.abspath(__file__)), 'backend')
     app.router.add_static('/dashboard/', path2)
     app.router.add_static('/', path)
