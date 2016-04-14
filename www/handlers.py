@@ -90,11 +90,16 @@ def cookie2user(cookie_str):
 #         'blogs': blogs
 #     }
 
-# @get('/')
-# def index():
-#     return {
-#         '__template__':'index.html'
-#     }
+@get('/')
+def index():
+    return {
+        '__template__':'index.html'
+    }
+@get('/phone')
+def phone():
+    return {
+        '__template__': '/phone/index.html'
+    }
 
 @get('/dashboard/i')
 def dashboard(request):
