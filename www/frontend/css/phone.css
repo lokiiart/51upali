@@ -180,9 +180,16 @@ img{
     position:fixed;
     bottom:0;
 }
-#footer tr td{
-    width: 34%;
+
+#footer ul li{
+    display:inline-block;
+    width: 25%;
 }
+
+#footer ul li img{
+    vertical-align:center;
+}
+
 img.img-box{
     position:relative;
     bottom:-0.2em;
