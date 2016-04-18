@@ -96,7 +96,6 @@ img{
 	color: red;
 	background-image: url(../images/wen.jpg);
 	background-repeat: no-repeat;
-	padding-left:30px;
 }
 #wd-wrapper p.wd-answer{
     color:black;
@@ -195,6 +194,7 @@ img.img-box{
 #zx-box{
     right:.4em;
 }
+
 
 #wx-box{
     right:.6em;
