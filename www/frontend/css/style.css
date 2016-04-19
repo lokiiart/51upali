@@ -18,8 +18,8 @@ html, body {
     height: 600px;
     position:absolute;
     left: 50%;
-    top: 50%;
-    margin: -470px 0 0 -480px;
+    top: 0;
+    margin: 0 0 0 -480px;
 }
 
 .img-wrapper{
