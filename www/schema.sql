@@ -11,7 +11,7 @@ grant select, insert, update, delete on awesome.* to 'www-data'@'localhost' iden
 create table pagecounts (
 `id` varchar(50) not null,
 `view_index` int not null, 
-`ip` varchar(50) not null,
+`user_ip` varchar(50) not null,
 `created_at` real not null,
 key `idx_created_at` (`created_at`),
 primary key (`id`)
