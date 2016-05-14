@@ -9,7 +9,7 @@ __author__ = 'Michael Liao'
 
 import time, uuid
 
-from orm import Model, StringField, BooleanField, FloatField, TextField
+from orm import Model, StringField, BooleanField, FloatField, TextField, IntegerField
 
 def next_id():
     return '%015d%s000' % (int(time.time() * 1000), uuid.uuid4().hex)
@@ -36,6 +36,14 @@ class Blog(Model):
     summary = StringField(ddl='varchar(200)')
     content = TextField()
     created_at = FloatField(default=time.time)
+
+class Pagecount(Model):
+    __table__ = 'pagecounts'
+    id = StringField(primary_key=True, default=next_id, ddl='varchar(50)')
+    view_index = IntegerField()
+    user_ip = StringField(ddl='varchar(50)')
+    created_at = FloatField(default=time.time)
+
 
 class Order(Model):
     __table__ = 'orders'

@@ -12,9 +12,9 @@ import markdown2
 from aiohttp import web
 
 from coroweb import get, post
-from apis import Page, APIValueError, APIResourceNotFoundError
+from apis import Page, APIValueError, APIResourceNotFoundError, APIPermissionError
 
-from models import Order, User, Comment, Blog, next_id
+from models import Order, User, Comment, Blog, Pagecount, next_id
 from config import configs
 
 COOKIE_NAME = 'awesession'
@@ -22,7 +22,7 @@ _COOKIE_KEY = configs.session.secret
 
 def check_admin(request):
     if request.__user__ is None or not request.__user__.admin:
-        raise APIPermissionError()
+        raise APIPermissionError("You don't have the permission")
 
 def get_page_index(page_str):
     p = 1
@@ -91,21 +91,23 @@ def cookie2user(cookie_str):
 #     }
 
 @get('/')
-def index():
+def index(request):
+    peername = request.transport.get_extra_info('peername')
+    host = '0.0.0.0'
+    if peername is not None:
+        host, port = peername
+    pagecount = Pagecount(view_index=0,user_ip={host})
+    yield from pagecount.save()
     return {
         '__template__':'index.html'
     }
-@get('/phone')
+
+@get('/pc')
 def phone():
     return {
-        '__template__': '/phone/index.html'
+        '__template__': '/index.html'
     }
 
-@get('/dashboard/i')
-def dashboard(request):
-    return {
-        '__template__': '/dashboard/index.html'
-    }
 
 
 @get('/blog/{id}')
@@ -121,10 +123,23 @@ def get_blog(id):
         'comments': comments
     }
 
+@get('/dashboard/i')
+def dashboard(request):
+    check_admin(request)
+    return {
+        '__template__': '/dashboard/index.html'
+    }
+
+@get('/login')
+def dashboard_login(request):
+    return {
+        '__template__': '/login.html'
+    }
+
 @get('/register')
 def register():
     return {
-        '__template__': 'register.html'
+        '__template__': '/register.html'
     }
 
 @get('/signin')
@@ -145,20 +160,24 @@ def authenticate(*, email, passwd):
     user = users[0]
     # check passwd:
     sha1 = hashlib.sha1()
-    sha1.update(user.id.encode('utf-8'))
-    sha1.update(b':')
-    sha1.update(passwd.encode('utf-8'))
+    passwd_sha1=email + ":" + passwd
+    sha1.update(passwd_sha1.encode('utf-8'))
+    # sha1.update(user.email.encode('utf-8'))
+    # sha1.update(b':')
+    # sha1.update(passwd.encode('utf-8'))
     if user.passwd != sha1.hexdigest():
-        raise APIValueError('passwd', 'Invalid password.')
+        raise APIValueError('passwd', sha1.hexdigest()+'<br />'+user.passwd)
     # authenticate ok, set cookie:
-    r = web.Response()
+    # referer = request.headers.get('Referer')
+    r = web.HTTPFound('/dashboard/i')
+    # r = web.Response()
     r.set_cookie(COOKIE_NAME, user2cookie(user, 86400), max_age=86400, httponly=True)
     user.passwd = '******'
-    r.content_type = 'application/json'
-    r.body = json.dumps(user, ensure_ascii=False).encode('utf-8')
+    # r.content_type = 'application/json'
+    # r.body = json.dumps(user, ensure_ascii=False).encode('utf-8')
     return r
 
-@get('/signout')
+@get('/logout')
 def signout(request):
     referer = request.headers.get('Referer')
     r = web.HTTPFound(referer or '/')
@@ -371,6 +390,27 @@ def api_create_order(request, *, customer, phone, province, city=' ', area=' ',a
     order = Order(customer=customer.strip(), price=price.strip(),phone=phone.strip(), address=address.strip(), payment=payment.strip(), notes=notes.strip())
     yield from order.save()
     return order
+
+@get('/pagecount/{index}')
+def pagecount(request,*,index):
+    if not index or not index.strip() or rubbish_filter(index):
+        raise APIValueError("别乱来","朋友")
+    peername = request.transport.get_extra_info('peername')
+    host = '0.0.0.0'
+    if peername is not None:
+        host, port = peername
+    pagecount = Pagecount(view_index=index.strip(),user_ip=host)
+    print("*******************INFO************************")
+    print("\n")
+    print("\n")
+    print("\n")
+    print(pagecount)
+    print("\n")
+    print("\n")
+    print("\n")
+    print("*******************INFO************************")
+    yield from pagecount.save()
+    return pagecount
 
 def rubbish_filter(string):
     pattern="[\s+\.\!\/_,$%^*(+\"\']+|[+——！，。？、~@#￥%……&*（）]+"

@@ -8,6 +8,15 @@ use awesome;
 
 grant select, insert, update, delete on awesome.* to 'www-data'@'localhost' identified by 'www-data';
 
+create table pagecounts (
+`id` varchar(50) not null,
+`view_index` int not null, 
+`ip` varchar(50) not null,
+`created_at` real not null,
+key `idx_created_at` (`created_at`),
+primary key (`id`)
+) engine=innodb default charset=utf8;
+
 create table users (
     `id` varchar(50) not null,
     `email` varchar(50) not null,

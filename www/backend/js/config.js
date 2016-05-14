@@ -16,6 +16,10 @@ function config($stateProvider, $urlRouterProvider, $ocLazyLoadProvider) {
 
     $stateProvider
 
+        .state('login', {
+            url: "/login",
+            templateUrl: "views/login.html",
+        })
         .state('index', {
             abstract: true,
             url: "/index",
